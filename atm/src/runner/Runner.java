@@ -3,10 +3,13 @@ package runner;
 import inputcenter.InputCenter;
 
 import manualexception.ManualException;
+
+import java.util.concurrent.TimeUnit;
+
 import accountdeclare.Account;
 import api.AtmAPI;
 
-public class Runner {
+public class Runner extends Thread{
 
 	AtmAPI api = new AtmAPI();
 	
@@ -15,10 +18,26 @@ public class Runner {
 	private static void menu()
 	{
 		System.out.println();
-		System.out.println("1) Put Customer Detail");
-		System.out.println("2) Read Customer General");
-		System.out.println("3) Read Key");
-		System.out.println("4) Tabular Customer Details");
+		System.out.println("1) Initialize ATM Balance");
+		System.out.println("2) Add ATM Balance");
+		System.out.println("3) View ATM Balance");
+		System.out.println("4) Put Customer Detail");
+		System.out.println("5) Read Customer General");
+		System.out.println("6) Read Key");
+		System.out.println("7) Tabular Customer Details");
+		System.out.println("8) Login");
+		System.out.println();
+	}
+	
+	private static void atmProcess()
+	{
+		System.out.println();
+		System.out.println("1) Check Balance");
+		System.out.println("2) Deposit Money");
+		System.out.println("3) Withdraw Money");
+		System.out.println("4) Transfer Money");
+		System.out.println("5) Check ATM Balance");
+		System.out.println("6) Mini Statement");
 		System.out.println();
 	}
 	
@@ -86,17 +105,170 @@ public class Runner {
 			System.out.println(e.getMessage());
 		}
 	}
+	
+	private void ATMBalance()
+	{
+		try
+		{
+			String noOfTwos = input.getString("No.of Two Thousand's : ");
+			
+			String noOfFives = input.getString("No.Of Five Hundred's : ");
+			
+			String noOfHuns = input.getString("No.of Hundred's : ");
+			
+			System.out.println(api.initialATMBalance(noOfTwos, noOfFives, noOfHuns));
+		}
+		catch(ManualException e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void addATMBalance()
+	{
+		try
+		{
+			int noOfTwos = input.getInt("No.of Two Thousand's : ");
+			
+			int noOfFives = input.getInt("No.Of Five Hundred's : ");
+			
+			int noOfHuns = input.getInt("No.of Hundred's : ");
+			
+			System.out.println("Updated ATM Balance\n");
+			
+			System.out.println(api.addATMBalance(noOfTwos, noOfFives, noOfHuns));
+		}
+		catch(ManualException e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void viewATMBalance()
+	{
+		try
+		{
+			System.out.println(api.viewATMBalance());
+		}
+		catch(ManualException e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void depositMoney(String fromAccNo, int amount)
+	{
+		try 
+		{
+			api.depositMoney(fromAccNo, amount);
+			
+			System.out.println("Deposited Successfully");
+			
+		} catch (ManualException e) 
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void transferMoney(String fromAccNo, String toAccNo , int amount)
+	{
+		try
+		{
+			System.out.println(api.transferMoney(fromAccNo, toAccNo, amount));
+		} catch (ManualException e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void miniStatement(String fromAccNo)
+	{
+		try {
+			System.out.println(api.miniStatement(fromAccNo));
+		} catch (ManualException e) 
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void handleATMProcess()
+	{
+//		try
+//		{
+		    String fromAccNo = input.getString("Account No : ");
+		    
+		    int pin = input.getInt("PIN : ");
+		    
+		    System.out.println(api.login(fromAccNo, pin));
+		    
+			if(api.login(fromAccNo, pin).contains("Welcome"))
+			{
+				
+			boolean flag = true;
+			
+			while(flag)
+			{
+			atmProcess();
+			int process = input.getInt("");
+			
+			switch(process)
+			{
+			case 0:
+				flag = false;
+				System.out.println("Don't forget to remove ur card\nThank You!");
+				break;
+			case 1:
+				System.out.println(api.balance(fromAccNo));
+				break;
+			case 2:
+			{
+				int amount = input.getInt("Deposit Money : ");
+				depositMoney(fromAccNo,amount);
+			}
+			case 3:
+				break;
+			case 4:
+			{
+				String toAccNo = input.getString("Enter To Account Number : ");
+				int amount = input.getInt("Transfer money must between ₹1000 and ₹10,000 : ");
+				
+				transferMoney(fromAccNo,toAccNo,amount);
+			}
+				break;
+			case 5:
+				viewATMBalance();
+				break;
+			case 6:
+				miniStatement(fromAccNo);
+				break;
+			default :
+				System.out.println("Invalid Operation!");
+			}
+			}
+			}
+			
+//		}
+//		catch(ManualException e)
+//		{
+//			System.out.println(e.getMessage());
+//		}
+	}
+
 
 	public static void main(String[] args) throws ManualException
 	{
 		InputCenter input = new InputCenter();
 		Runner run = new Runner();
+		
 		run.load();
+		
+		
 		boolean flag = true;
 		
 		while(flag)
 		{
 			menu();
+			
 			int choice = input.getInt("");
 			
 			switch(choice)
@@ -106,18 +278,31 @@ public class Runner {
 				System.out.println("Runner Terminated");
 				break;
 			case 1:
-				run.customerDetail();
+				run.ATMBalance();
 				break;
 			case 2:
-				run.readCustomer();
+				run.addATMBalance();
 				break;
 			case 3:
+				run.viewATMBalance();
+				break;
+			case 4:
+				run.customerDetail();
+				break;
+			case 5:
+				run.readCustomer();
+				break;
+			case 6:
 				run.readKey();
 				break;
-
-			case 4:
+			case 7:
 				run.tabularCustomerDetails();
 				break;
+			case 8:
+				
+				run.handleATMProcess();
+				break;
+			
 			}
 		}
 	}

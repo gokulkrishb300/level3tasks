@@ -13,6 +13,18 @@ import manualexception.ManualException;
 
 public class Json {
 	
+	public void jsonWriteTrue(JSONObject jsonObj , String fileName) throws ManualException
+	{
+		try(FileWriter writer = new FileWriter(fileName,true);)
+		{
+			writer.write(jsonObj.toJSONString());
+		}
+		catch(IOException io)
+		{
+			throw new ManualException("File Writing Failed for "+fileName);
+		}
+	}
+	
 	public void jsonWrite(JSONObject jsonObj , String fileName) throws ManualException
 	{
 		try(FileWriter writer = new FileWriter(fileName);)
