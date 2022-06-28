@@ -156,15 +156,25 @@ public class Runner extends Thread{
 		}
 	}
 	
-	private void depositMoney(String fromAccNo, int amount)
+	private void depositMoney(String fromAccNo, int noOfTwos, int noOfFiveHuns , int noOfHuns)
 	{
 		try 
 		{
-			api.depositMoney(fromAccNo, amount);
-			
-			System.out.println("Deposited Successfully");
+			System.out.println(api.depositMoney(fromAccNo, noOfTwos,noOfFiveHuns, noOfHuns));
 			
 		} catch (ManualException e) 
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void withdrawMoney(String fromAccNo, int amount)
+	{
+		try
+		{
+			System.out.println(api.withdraw(fromAccNo, amount));
+		}
+		catch(ManualException e)
 		{
 			System.out.println(e.getMessage());
 		}
@@ -222,10 +232,20 @@ public class Runner extends Thread{
 				break;
 			case 2:
 			{
-				int amount = input.getInt("Deposit Money : ");
-				depositMoney(fromAccNo,amount);
+				int noOfTwos = input.getInt("No.of two thousand's : ");
+				
+				int noOfFiveHuns = input.getInt("No.of five hundred's : ");
+				
+				int noOfHuns = input.getInt("No.of hundred's : ");
+				
+				depositMoney(fromAccNo,noOfTwos, noOfFiveHuns, noOfHuns);
 			}
+			break;
 			case 3:
+			{
+				int amount = input.getInt("Withdraw money must between ₹1000 and ₹10,000 : ");
+				withdrawMoney(fromAccNo,amount);
+			}
 				break;
 			case 4:
 			{
